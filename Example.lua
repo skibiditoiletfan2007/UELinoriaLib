@@ -19,14 +19,14 @@
       https://github.com/violin-suzutsuki/LinoriaLib/blob/main/Example.lua                
 --]]
 
-local repo = "https://raw.githubusercontent.com/divinitylua/UELinoriaLib/main"
+local repo = "https://raw.githubusercontent.com/divinitylua/UELinoriaLib/main/"
 
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
-local Options = Library.Options
-local Toggles = Library.Toggles
+local Options = getgenv().Options
+local Toggles = getgenv().Toggles
 
 Library.ShowToggleFrameInKeybinds = true -- Make toggle keybinds work inside the keybinds UI (aka adds a toggle to the UI). Good for mobile users (Default value = true)
 Library.ShowCustomCursor = true -- Toggles the Linoria cursor globaly (Default value = true)
@@ -606,18 +606,16 @@ LeftGroupBox:AddLabel("Press Keybind"):AddKeyPicker("KeyPicker2", {
 	end
 })
 
--- Label:AddDropdown
--- Arguments: Idx, Info
+-- Groupbox:AddDropdown
+-- (Label:AddDropdown is not supported in this fork)
 
--- Info table is the same as the default Dropdowns
--- These dropdowns are very compacted
-
-LeftGroupBox:AddLabel("Dropdown"):AddDropdown("MyDropdown", {
+LeftGroupBox:AddDropdown("MyDropdown2", {
+	Text = "Compact Dropdown",
 	Values = { "Addon", "Dropdown" },
 	Default = 1, -- number index of the value / string
 	Multi = false, -- true / false, allows multiple choices to be selected
 
-	-- Text is not required for this Dropdown --
+	-- Text is usually required for Groupbox dropdowns --
 	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
 	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
 
@@ -745,10 +743,10 @@ SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 -- and game configs in a separate folder per game
 ThemeManager:SetFolder("MyScriptHub")
 SaveManager:SetFolder("MyScriptHub/specific-game")
-SaveManager:SetSubFolder("specific-place") -- if the game has multiple places inside of it (for example: DOORS) 
+-- SaveManager:SetSubFolder("specific-place") -- if the game has multiple places inside of it (for example: DOORS) 
 					   -- you can use this to save configs for those places separately
 					   -- The path in this script would be: MyScriptHub/specific-game/settings/specific-place
-					   -- [ This is optional ]
+					   -- [ This is optional ] (Not supported in this fork)
 
 -- Builds our config menu on the right side of our tab
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
