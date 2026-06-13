@@ -2377,7 +2377,8 @@ do
             BackgroundTransparency = 1;
             Position = UDim2.new(1, -16, 0.5, 0);
             Size = UDim2.new(0, 12, 0, 12);
-            Image = 'http://www.roblox.com/asset/?id=6282522798';
+            TextSize = Library.FontSize;
+            Text = '>';
             ZIndex = 8;
             Parent = DropdownInner;
         });
@@ -2610,13 +2611,13 @@ do
         function Dropdown:OpenDropdown()
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
-            DropdownArrow.Rotation = 180;
+            DropdownArrow.Text = "<";
         end;
 
         function Dropdown:CloseDropdown()
             ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
-            DropdownArrow.Rotation = 0;
+            DropdownArrow.Text = ">";
         end;
 
         function Dropdown:OnChanged(Func)
