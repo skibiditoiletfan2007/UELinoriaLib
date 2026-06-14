@@ -5,10 +5,13 @@ local Teams = game:GetService('Teams');
 local Players = game:GetService('Players');
 local RunService = game:GetService('RunService')
 local TweenService = game:GetService('TweenService');
+local MarketplaceService = game:GetService("MarketplaceService");
 local Lighting = game:GetService('Lighting');
 local RenderStepped = RunService.RenderStepped;
 local LocalPlayer = Players.LocalPlayer;
 local Mouse = LocalPlayer:GetMouse();
+
+local HighlightSize = UDim2.new(1, 0, 0, 1);
 
 local ProtectGui = protectgui or (syn and syn.protect_gui) or (function() end);
 
@@ -69,6 +72,24 @@ Library.BlurEffect.Name = "LinoriaBlur"
 Library.BlurEffect.Size = 0
 Library.BlurEffect.Enabled = false
 pcall(function() Library.BlurEffect.Parent = Lighting end)
+
+function Library:GetWindowTitle(Text)
+    local Color = Library.AccentColor
+
+    local R = math.floor(Color.R * 255 + 0.5)
+    local G = math.floor(Color.G * 255 + 0.5)
+    local B = math.floor(Color.B * 255 + 0.5)
+
+    return Text:gsub(
+        "<ac>(.-)</ac>",
+        string.format(
+            '<font color="rgb(%d, %d, %d)">%%1</font>',
+            R,
+            G,
+            B
+        )
+    )
+end
 
 function Library:UpdateBlur()
     if Library.UseBlur then
@@ -568,7 +589,7 @@ do
         local Highlight = Library:Create('Frame', {
             BackgroundColor3 = Library.AccentColor;
             BorderSizePixel = 0;
-            Size = UDim2.new(1, 0, 0, 2);
+            Size = HighlightSize;
             ZIndex = 17;
             Parent = PickerFrameInner;
         });
@@ -2909,7 +2930,7 @@ do
     local ColorFrame = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 0, 2);
+        Size = HighlightSize;
         ZIndex = 102;
         Parent = KeybindInner;
     });
@@ -3163,7 +3184,7 @@ function Library:CreateWindow(...)
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 0);
         Size = UDim2.new(1, 0, 0, 25);
-        Text = Config.Title or '';
+        Text = Library:GetWindowTitle(Config.Title) or '';
         RichText = true; 
         TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 1;
@@ -3182,17 +3203,21 @@ function Library:CreateWindow(...)
     Library:AddToRegistry(MapNameLabel, {
         TextColor3 = 'AccentColor';
     });
+
     task.spawn(function()
-        local success, info = pcall(function()
-            return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
-        end)
-        if success and info and info.Name then
-            MapNameLabel.Text = info.Name
+        if not Config.GameTitle then
+            local Success, Info = pcall(function()
+                return MarketplaceService:GetProductInfoAsync(game.PlaceId)
+            end)
+            if Success and Info and Info.Name then
+                MapNameLabel.Text = Info.Name
+            else
+                MapNameLabel.Text = game.Name or "Unknown Map"
+            end
         else
-            MapNameLabel.Text = game.Name or "Unknown Map"
+            MapNameLabel.Text = Config.GameTitle
         end
     end)
-
 
     local TabBarOuter = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor;
@@ -3267,6 +3292,8 @@ function Library:CreateWindow(...)
         BorderColor3 = 'OutlineColor';
     });
     function Window:SetWindowTitle(Title)
+        local Title = Library:GetWindowTitle(Title);
+
         WindowLabel.Text = Title;
     end;
     function Window:AddTab(Name)
@@ -3298,7 +3325,7 @@ function Library:CreateWindow(...)
             BackgroundColor3 = Library.AccentColor;
             BorderSizePixel = 0;
             Position = UDim2.new(0, 0, 0, 0);
-            Size = UDim2.new(1, 0, 0, 2); 
+            Size = HighlightSize; 
             Visible = false; 
             ZIndex = 4;
             Parent = TabButton;
@@ -3414,7 +3441,7 @@ function Library:CreateWindow(...)
             local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Size = UDim2.new(1, 0, 0, 2);
+                Size = HighlightSize;
                 ZIndex = 5;
                 Parent = BoxInner;
             });
@@ -3527,7 +3554,7 @@ function Library:CreateWindow(...)
                 local TabHighlight = Library:Create('Frame', {
                     BackgroundColor3 = Library.AccentColor;
                     BorderSizePixel = 0;
-                    Size = UDim2.new(1, 0, 0, 2);
+                    Size = HighlightSize;
                     Visible = false;
                     ZIndex = 10;
                     Parent = Button;
