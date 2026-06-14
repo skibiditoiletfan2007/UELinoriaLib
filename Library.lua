@@ -3153,6 +3153,7 @@ function Library:CreateWindow(...)
 
     local Window = {
         Tabs = {};
+        Title = Config.Title;
     };
 
     local Outer = Library:Create('Frame', {
@@ -3184,7 +3185,7 @@ function Library:CreateWindow(...)
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 0);
         Size = UDim2.new(1, 0, 0, 25);
-        Text = Library:GetWindowTitle(Config.Title) or '';
+        Text = Library:GetWindowTitle(Window.Title) or '';
         RichText = true; 
         TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 1;
@@ -3292,9 +3293,9 @@ function Library:CreateWindow(...)
         BorderColor3 = 'OutlineColor';
     });
     function Window:SetWindowTitle(Title)
-        local Title = Library:GetWindowTitle(Title);
+        Window.Title = Title;
 
-        WindowLabel.Text = Title;
+        WindowLabel.Text = Library:GetWindowTitle(Title);
     end;
     function Window:AddTab(Name)
         local Tab = {
@@ -3769,6 +3770,10 @@ function Library:CreateWindow(...)
 
     if Config.AutoShow then task.spawn(Library.Toggle) end
 
+    function Library:RefreshWindowTitle()
+        WindowLabel.Text = Library:GetWindowTitle(Window.Title);
+    end;
+
     Window.Holder = Outer;
     return Window;
 end;
@@ -3923,11 +3928,13 @@ if InputService.TouchEnabled then
             and Library.AccentColor
             or  Color3.fromRGB(255, 255, 255)
     end)
+end
 
-    local _origUpdate = Library.UpdateColorsUsingRegistry
-    Library.UpdateColorsUsingRegistry = function(self)
-        _origUpdate(self)
-    end
+local _origUpdate = Library.UpdateColorsUsingRegistry
+Library.UpdateColorsUsingRegistry = function(self)
+    Library:RefreshWindowTitle()
+
+    _origUpdate(self)
 end
 
 getgenv().Library = Library
